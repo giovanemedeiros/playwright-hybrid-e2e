@@ -228,6 +228,27 @@ test.describe.serial('Hybrid E2E Flow - Serverest', () => {
   // ---- [AB#11] [Teardown & CI/CD] Validar limpeza de dados via API e execução no GitHub Actions ----
   test('Should delete cart, product and users via API teardown successfully', async ({ request }) => {
 
+    const deleteCart = await 
+    request.delete('https://serverest.dev/carrinhos/cancelar-compra', {
+      headers: { Authorization: clientToken }
+    });
+
+    expect(deleteCart.status()).toBe(200);
+
+    const deleteProduct = await 
+    request.delete(`https://serverest.dev/produtos/${productId}`, {
+      headers: { Authorization: adminToken }
+    });
+    expect(deleteProduct.status()).toBe(200);
+
+    const deleteClient = await 
+    request.delete(`https://serverest.dev/usuarios/${clientId}`);
+    expect(deleteClient.status()).toBe(200);  
+
+    const deleteAdmin = await 
+    request.delete(`https://serverest.dev/usuarios/${adminId}`);
+    expect(deleteAdmin.status()).toBe(200);
+
   });
 
 });
