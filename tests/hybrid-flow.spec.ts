@@ -195,6 +195,34 @@ test.describe.serial('Hybrid E2E Flow - Serverest', () => {
   // ---- [AB#10] [UI E2E] Validar conferência de itens no carrinho e finalização da compra ----
   test('Should review cart items and complete checkout successfully', async ({ page }) => {
 
+      // Inject token into localStorage
+    await page.addInitScript(({ token }) => {
+      window.localStorage.setItem('serverest/userToken', token);
+    }, { token: clientToken });
+
+    // Navigate to home page
+    await page.goto('https://front.serverest.dev/home');
+
+    // Verify that the page loaded
+    await expect(page.getByText(/serverest store/i)).toBeVisible();
+
+    const productCard = page.locator('.card').filter({ hasText: productName });
+    await productCard.getByTestId('adicionarNaLista').click();
+
+    await expect(page).toHaveURL(/minhaListaDeProdutos/);
+
+    // Valid the dynamic product name
+    await expect(page.getByText(new RegExp(productName, 'i'))).toBeVisible();
+
+    // Valid total quantity is 1
+    await expect(page.getByText('Total: 1')).toBeVisible();
+
+    // Click on "Add to Cart" button to proceed to checkout
+    await page.getByRole('button', { name: /adicionar no carrinho/i }).click();
+    
+    // Valid redirection to information screen
+    await expect(page.getByText(/em construção aguarde/i)).toBeVisible();
+
   });
 
   // ---- [AB#11] [Teardown & CI/CD] Validar limpeza de dados via API e execução no GitHub Actions ----
